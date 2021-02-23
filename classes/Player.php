@@ -1,47 +1,45 @@
 <?php
 declare(strict_types=1);
-require 'Deck.php';
 
 class Player
 {
- private array $cards=[];
- private bool $lost = false;
-
+    private array $cards = [];
+    private bool $lost = false;
+    public const WIN_NUMBER = 21;
 
     public function __construct(Deck $deck)
     {
-        array_push($this->cards[],$deck->drawCard());
-        array_push($this->cards[],$deck->drawCard());
+        $this->cards[] = $deck->drawCard();
+        $this->cards[] = $deck->drawCard();
     }
 
-
-    public function hit(){
-
- }
-
-    public function surrender(){
-
+    public function surrender() :void
+    {
+        $this->lost = true;
     }
 
-    public function getScore(){
-        foreach ($cards AS $card){
-            return self::class;
+    public function getScore(): int
+    {
+        $score = 0;
+        foreach ($this->cards as $card) {
+            $score += $card->getValue();
         }
+        return $score;
     }
 
-    public function hasLost() : bool {
+    public function hasLost(): bool
+    {
         return $this->lost;
     }
 
-
-
-
-
-
-
-
-
-
+    public function hit(Deck $deck) :void
+    {
+        if ($this->getScore() > self::WIN_NUMBER) {
+            $this->lost = true;
+        } else {
+            $this->$deck->drawCard();
+        }
+    }
 
 
 }
