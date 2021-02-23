@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 class Blackjack
 {
-        private Player$player;
+        private Player $player;
         private Player $dealer;
         private Deck $Deck;
 
