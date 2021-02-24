@@ -5,7 +5,7 @@ class Player
 {
     private array $cards = [];
     private bool $lost = false;
-    public const WIN_NUMBER = 21;
+    private const WIN_NUMBER = 21;
 
     public function __construct(Deck $deck)
     {
@@ -37,9 +37,21 @@ class Player
         if ($this->getScore() > self::WIN_NUMBER) {
             $this->lost = true;
         } else {
-            $this->$deck->drawCard();
+            $deck->drawCard();
         }
     }
 
 
+}
+
+class Dealer extends Player {
+
+    private const DEALER_NUMBER = 15;
+
+    public function hit(Deck $deck) : void {
+
+        if($this->getScore() >= self::DEALER_NUMBER){
+            parent::hit($deck);
+        }
+    }
 }
