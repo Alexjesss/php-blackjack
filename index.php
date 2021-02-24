@@ -8,45 +8,57 @@ if (!isset($_SESSION['$blackjack'])) {
 }
 
 $blackjackGame = $_SESSION['$blackjack'];
+$dealerScore = $blackjackGame->getDealer()->getScore();
+$playerScore = $blackjackGame->getPlayer()->getScore();
 
-
-// If he is not lost, compare scores to set the winner (If equal the dealer wins).
-
-//1. Always display on the page the scores of both players. If you have a winner, display it.
-//1. End of the game: destroy the current `blackjack` variable so the game restarts.
 
 if (isset($_POST['hit'])) {
-    $blackjackGame->getDeck()->drawCard();
-    if ($blackjackGame->getScore() > Player::WIN_NUMBER){
-        $blackjackGame->Winner();
+    $blackjackGame->getPlayer()->hit($blackjackGame->getDeck());
+    $blackjackGame->getPlayer()->getScore();
+    if ($blackjackGame->getPlayer()->getLost()) {
+        Winner($blackjackGame, $playerScore, $dealerScore);
+
     }
 }
 
 if (isset($_POST['surrender'])) {
     $blackjackGame->getPlayer()->surrender();
+    unset($_SESSION['$blackjack']);
 }
 
 if (isset($_POST['stand'])) {
     $blackjackGame->getDealer()->hit($blackjackGame->getDeck());
-    $blackjackGame->Winner();
     if ($blackjackGame->getDealer()->getLost()) {
-        $blackjackGame->Winner();
+        Winner($blackjackGame, $playerScore, $dealerScore);
     }
 }
 
-function Winner($blackjackGame)
+if (isset($_POST['restart'])) {
+    unset($_SESSION['$blackjack']);
+}
+
+function Winner($blackjackGame, $playerScore, $dealerScore): string
 {
-    if ($blackjackGame->getPlayer()->getScore() < Player::WIN_NUMBER || $blackjackGame->getPlayer()->getScore() > $blackjackGame->getDealer()->getScore()) {
+    if (($playerScore < Player::WIN_NUMBER && $playerScore > $dealerScore) || $dealerScore > Player::WIN_NUMBER) {
         $blackjackGame->getDealer()->setLost(true);
-    } else if ($blackjackGame->getPlayer()->getScore() < Player::WIN_NUMBER || $blackjackGame->getPlayer()->getScore() < $blackjackGame->getDealer()->getScore()) {
+        unset($_SESSION);
+        return "The winner is the player";
+
+    } else if (($playerScore < $dealerScore) || $playerScore > Player::WIN_NUMBER) {
         $blackjackGame->getDealer()->setLost(false);
-    } else if ($blackjackGame->getPlayer()->getScore() > Player::WIN_NUMBER || $blackjackGame->getPlayer()->getScore() === $blackjackGame->getDealer()->getScore()) {
+        unset($_SESSION);
+        return "The winner is the dealer";
+    } else if ($playerScore == $dealerScore) {
         $blackjackGame->getPlayer()->setLost(true);
+        unset($_SESSION);
+        return "The winner is the dealer";
     } else {
         $blackjackGame->getPlayer()->setLost(false);
+        unset($_SESSION);
+        return "The winner is the player";
     }
-
 }
+
 
 ?>
 
@@ -60,14 +72,23 @@ function Winner($blackjackGame)
     <title>blackjack game</title>
 </head>
 <body>
-<h3><?php echo "The winner is" . " " ?></h3>
-<h2>Player:<?php echo $blackjackGame->getPlayer()->getScore(); ?></h2>
-<h2>Dealer:<?php echo $blackjackGame->getDealer()->getScore(); ?></h2>
-<h1><?php $blackjackGame->getPlayer()->playingCards(); ?></h1>
-<form method="post">
-    <button type="submit" name="hit">Hit</button>
-    <button type="submit" name="surrender">Surrender</button>
-    <button type="submit" name="stand">Stand</button>
-</form>
+<?php if (isset($_POST['surrender'])):?>
+    <h3>Play again?</h3>
+    <h2></h2>
+    <h1></h1>
+    <form></form>
+<button type="submit" name="restart">Restart</button>
+<?php else:?>
+    <h3><?php echo Winner($blackjackGame, $playerScore, $dealerScore);?></h3>
+    <h2>Player:<?php echo $blackjackGame->getPlayer()->getScore();?></h2>
+    <h2>Dealer:<?php echo $blackjackGame->getDealer()->getScore();?></h2>
+    <h1><?php $blackjackGame->getPlayer()->playingCards();?></h1>
+    <form method="post">
+        <button type="submit" name="hit">Hit</button>
+        <button type="submit" name="surrender">Surrender</button>
+        <button type="submit" name="stand">Stand</button>
+        <button type="submit" name="restart">Restart</button>
+    </form>
+<?php endif;?>
 </body>
 </html>
