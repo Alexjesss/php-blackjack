@@ -41,10 +41,9 @@ class Player
 
     public function hit(Deck $deck): void
     {
+        $this->cards[] = $deck->drawCard();
         if ($this->getScore() > self::WIN_NUMBER) {
             $this->lost = true;
-        } else {
-            $deck->drawCard();
         }
     }
 
