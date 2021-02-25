@@ -35,6 +35,8 @@ if (isset($_POST['stand'])) {
 
 if (isset($_POST['restart'])) {
     unset($_SESSION['$blackjack']);
+    header('location:index.php?message=New game has begun');
+    exit;
 }
 
 function Winner($blackjackGame, $playerScore, $dealerScore): string
@@ -69,6 +71,7 @@ function Winner($blackjackGame, $playerScore, $dealerScore): string
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="stylesheet.css" type="text/css">
     <title>blackjack game</title>
 </head>
 <body>
@@ -84,9 +87,10 @@ function Winner($blackjackGame, $playerScore, $dealerScore): string
     <h2>Dealer:<?php echo $blackjackGame->getDealer()->getScore();?></h2>
     <h1><?php $blackjackGame->getPlayer()->playingCards();?></h1>
     <form method="post">
-        <button type="submit" name="hit">Hit</button>
+        <?php $disableButton = $blackjackGame->getPlayer()->getLost() || $blackjackGame->getPlayer()->getLost() ? 'disabled': "";?>
+        <button type="submit" name="hit" <?php echo $disableButton;?>>Hit</button>
         <button type="submit" name="surrender">Surrender</button>
-        <button type="submit" name="stand">Stand</button>
+        <button type="submit" name="stand" <?php echo $disableButton;?>>Stand</button>
         <button type="submit" name="restart">Restart</button>
     </form>
 <?php endif;?>
